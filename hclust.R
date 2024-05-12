@@ -40,6 +40,9 @@ create_hclust_plot <- function(method.dist, method.clust, space) {
     select(-strain)
   row.names(d2_cluster) <- d$ID
   
+  write.csv(d2_cluster, "data_for_clustering.csv", quote=F)
+  
+  
   d2_dist <- dist(d2_cluster, method = method.dist)
   d2_hclust <- hclust(d2_dist, method = method.clust)
   
