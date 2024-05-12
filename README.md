@@ -1,2 +1,3 @@
 # scom_mycelial_growth_2024
-Mycelial growth patterns of Schizophyllum commune
+Rscripts used in mycelial growth analysis of Schizophyllum commune in Matsumae et al.
+
