@@ -37,6 +37,8 @@ d2_cluster <- d_one_hot %>%
   select(-Medium)
 row.names(d2_cluster) <- d2$ID
 
+write.csv(d2_cluster, "data_for_clustering.csv", quote=F)
+
 # k-means
 k_values <- 2:28
 cluster_results <- lapply(k_values, function(k) {
