@@ -82,16 +82,33 @@ gp <- ggplot(d2, aes(x = Grayness_day4.day0, y = Area_day4.day0, shape = dataset
 ggsave(file="scatterplot_color_by_strain_shape_by_condtion.pdf", width=297, height=210, units="mm", dpi=600)
 
 
-### average
-stats <- d %>%
-  group_by(dataset) %>%
-  summarise(Area_Average = mean(Area_day4.day0),
-            Area_SD = sd(Area_day4.day0),
-            Gray_Average = mean(Grayness_day4.day0),
-            Gray_SD = sd(Grayness_day4.day0)) %>%
-  mutate(strain = dataset, Temperature = dataset, Medium = dataset) %>%
-  separate(dataset, into = c("strain", "Temperature", "Medium"), sep = "_", remove = FALSE)
+##  Calculate summary statistics and plotting averaged Area and Whiteness
+stats <- d2 %>%
+  group_by(strain, Medium, Temperature) %>%
+  summarise(
+    Area_Average = mean(Area_day4.day0),
+    Area_SD = sd(Area_day4.day0),
+    Gray_Average = mean(Grayness_day4.day0),
+    Gray_SD = sd(Grayness_day4.day0),
+    .groups = 'drop'
+  )  %>%
+  mutate(shape_label = paste(Medium, Temperature, sep="_"))
 
+gp <- ggplot(stats, aes(x = Gray_Average, y = Area_Average, color = strain, shape = shape_label)) +
+  geom_point(size=5) +
+  geom_errorbar(aes(ymin = Area_Average - Area_SD, ymax = Area_Average + Area_SD), width = 0.02) +
+  geom_errorbarh(aes(xmin = Gray_Average - Gray_SD, xmax = Gray_Average + Gray_SD), height = 1) +
+  scale_color_manual(values = colors) + 
+  scale_shape_manual(values = shapes) +  
+  theme_minimal() +
+  theme(text = element_text(size = 24),
+        panel.background = element_rect(fill = "white", colour = "black", size = 1.2)) +
+  labs(title = "",
+       x = "Whiteness",
+       y = "Area",
+       color = "Strain",
+       shape = "Culture Condition") 
+ggsave(file="scatterplot_average.pdf", plot = gp, width=297, height=210, units="mm", dpi=600)
 
 ## plot boxplot for d2
 ## making grey areas representing "Medium is poor"
