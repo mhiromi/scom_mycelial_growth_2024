@@ -9,11 +9,12 @@ library(ggplot2)
 
 # Shapes 0 to 24 are available; choose 5 distinct ones for illustration
 shapes <- rep(c(16, 17, 18, 15),times=7)  # four combinations for each strain, x 7 strains
-colors <- c("#84919e", "#1f77b4", "#ff7f0e",  "#d62728", "#9467bd", "#8c564b", "#e377c2")
+colors.seven <- c("#84919e", "#1f77b4", "#ff7f0e",  "#d62728", "#9467bd", "#8c564b", "#e377c2")
 
 
 d <- read.csv("data.csv")
 d$strain <- as.factor(d$strain)
+
 
 # replacing values of column Medium (Poor/Rich) to low/high
 d2 <- d %>%
@@ -26,7 +27,13 @@ d2 <- d %>%
   mutate(strain = paste("FC", strain, sep = "")) %>%
   mutate(strain = if_else(strain == "FC6170", "FC6170(IFM65656)", strain)) %>% 
   # creating a dataset2
-  mutate(dataset2 = paste(strain, Medium, Temperature, sep = "_"))
+  mutate(dataset2 = paste(strain, Medium, Temperature, sep = "_")) %>% 
+  mutate(shape_label = paste(Medium, Temperature, sep="_"))
+
+
+strain <- data.frame("strain" = d2$strain)
+unique_strain <- unique(d2$strain)
+rownames(strain) <- d2$ID
 
 
 ### colored by medium, no shape
@@ -59,15 +66,9 @@ gp <- ggplot(d2, aes(x = Grayness_day4.day0, y = Area_day4.day0, color = Tempera
        y = "Area") 
 ggsave(file="scatterplot_temperature.pdf", width=297, height=210, units="mm", dpi=600)
 
-# Shapes 0 to 24 are available; choose 5 distinct ones for illustration
-shapes <- rep(c(16, 17, 18, 15),times=7)  # four combinations for each strain, x 7 strains
-colors.seven <- c("#84919e", "#1f77b4", "#ff7f0e",  "#d62728", "#9467bd", "#8c564b", "#e377c2")
 
-strain <- data.frame("strain" = d2$strain)
-unique_strain <- unique(d2$strain)
-rownames(strain) <- d2$ID
-
-gp <- ggplot(d2, aes(x = Grayness_day4.day0, y = Area_day4.day0, shape = dataset, color = strain)) +
+## scatter plot of area and whiteness with all labels
+gp <- ggplot(d2, aes(x = Grayness_day4.day0, y = Area_day4.day0, shape = dataset, color = dataset2)) +
   geom_point(size=5) +
   scale_color_manual(values = colors.seven) + 
   scale_shape_manual(values = shapes) +  
@@ -98,7 +99,7 @@ gp <- ggplot(stats, aes(x = Gray_Average, y = Area_Average, color = strain, shap
   geom_point(size=5) +
   geom_errorbar(aes(ymin = Area_Average - Area_SD, ymax = Area_Average + Area_SD), width = 0.02) +
   geom_errorbarh(aes(xmin = Gray_Average - Gray_SD, xmax = Gray_Average + Gray_SD), height = 1) +
-  scale_color_manual(values = colors) + 
+  scale_color_manual(values = colors.seven) + 
   scale_shape_manual(values = shapes) +  
   theme_minimal() +
   theme(text = element_text(size = 24),
